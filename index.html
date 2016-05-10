@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name='viewport' content='width=device-width,initial-scale=1.0,user-scalable=no'/>
+    <title>徐畅的网络博客</title>
+    <link rel="stylesheet" href="./static/css/component.min.css">
+</head>
+<body>
+
+
+
+<div id="loader1" class="pageload-overlay" data-opening="m -5,-5 0,70 90,0 0,-70 z m 5,35 c 0,0 15,20 40,0 25,-20 40,0 40,0 l 0,0 C 80,30 65,10 40,30 15,50 0,30 0,30 z">
+    <svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 80 60" preserveAspectRatio="none" >
+        <path d="m -5,-5 0,70 90,0 0,-70 z m 5,5 c 0,0 7.9843788,0 40,0 35,0 40,0 40,0 l 0,60 c 0,0 -3.944487,0 -40,0 -30,0 -40,0 -40,0 z"/>
+    </svg>
+</div>
+<div id="fly-main">
+    <section class="fly-menu">
+        <ul class="fly-menu-C">
+            <li>前端总览</li>
+            <li>前端总览</li>
+            <li>前端总览</li>
+        </ul>
+        <nav class="fly-nav-ico">
+            <div class="active">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </nav>
+    </section>
+</div>
+<nav class="fly-nav">
+    <div>
+        <img src="./static/images/h5.png" alt="">
+    </div>
+    <ul>
+        <li>前端总览</li>
+        <li>前端总览</li>
+    </ul>
+</nav>
+
+<script src="./static/libs/snap.svg-min.js"></script>
+<script>
+    var currentLoader = {
+        id:"loader1",
+        speedIn:300
+    };
+    window.loader = new SVGLoader( document.getElementById( currentLoader.id ), { speedIn : currentLoader.speedIn, easingIn : mina.easeinout } );
+    window.loader.show();
+</script>
+<script src="http://localhost:4000/index.js" onload="window.loader.hide();window.loader.el.style.display='none'"></script>
+<!--<script src="./static/js/index.js" onload="window.loader.hide();window.loader.el.style.display='none'"></script>-->
+</body>
+</html>
