@@ -48,8 +48,27 @@ const utilMethods = {
         return Array.from(obj.classList).indexOf(className) > -1;
 
     },
+    removeClass(obj,className){
+        if(obj.length){
+            obj.forEach(o=>{
+                o.classList.remove(className);
+            })
+        }
+        else{
+            obj.classList.remove(className)
+        }
+
+    },
     addClass(obj,className){
-        obj.classList.add(className)
+        if(obj.length){
+            obj.forEach(o=>{
+                o.classList.add(className);
+            })
+        }
+        else{
+            obj.classList.add(className)
+        }
+
     },
     index(elems, parent, selector) {
         var parent = parent || elems.parentNode,

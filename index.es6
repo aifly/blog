@@ -2,14 +2,15 @@
  created by fly on 2016/5/10 0010
  */
 import './static/css/index.css';
-import bg from  './static/images/2.png';
-import bodyBg from  './static/images/1.png';
-import {utilMethod,_$,$$} from './utilMethods.es6';
+import bg from  './static/images/1.png';
+import {utilMethods,_$,$$} from './utilMethods.es6';
 
 let data = {
     main: _$('#fly-main'),
     navIco:_$('.fly-nav-ico'),
-    menu:_$('.fly-menu')
+    menu:_$('.fly-nav'),
+    mask:_$('#fly-main .fly-mask'),
+    page1:_$('#fly-page1')
 }
 
 
@@ -20,18 +21,31 @@ let util = {
     },
     bindEvent(){
 
-        data.navIco.addEventListener('click',()=>{
-            _$('div',data.navIco).classList.toggle('active');
+        let f  = ()=>{
+            data.mask.classList.toggle('show');
+            data.main.classList.toggle('active');
             data.menu.classList.toggle('active');
-        });
+        }
 
         data.navIco.addEventListener('mousedown',()=>{
             this.toggleMenu(true);
         });
         data.navIco.addEventListener('mouseup',()=>{
             this.toggleMenu(false);
+
+            utilMethods.addClass($$('li',data.menu),'active');
+
+            f();
+
         });
-        data.navIco.addEventListener('mouseout',()=>{
+
+        data.mask.addEventListener('click',()=>{
+            f();
+            utilMethods.removeClass($$('li',data.menu),'active');
+        })
+
+
+       data.navIco.addEventListener('mouseout',()=>{
             this.toggleMenu(false);
         });
     },
@@ -45,11 +59,10 @@ let util = {
     },
     setBg(){
         let arr = [
-            document.body,
-            data.main
+            data.page1
         ];
-        [bodyBg, bg].forEach((b, i)=> {
-            arr[i].style.background = 'url(' + b + ') no-repeat center center';
+        [bg].forEach((b, i)=> {
+            arr[i].style.background = 'url(./static/js/' + b + ') no-repeat center center';
             arr[i].style.backgroundSize = 'cover';
         });
     }

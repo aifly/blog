@@ -15,29 +15,32 @@
         <path d="m -5,-5 0,70 90,0 0,-70 z m 5,5 c 0,0 7.9843788,0 40,0 35,0 40,0 40,0 l 0,60 c 0,0 -3.944487,0 -40,0 -30,0 -40,0 -40,0 z"/>
     </svg>
 </div>
-<div id="fly-main">
-    <section class="fly-menu">
-        <ul class="fly-menu-C">
-            <li>前端总览</li>
-            <li>前端总览</li>
-            <li>前端总览</li>
-        </ul>
-        <nav class="fly-nav-ico">
-            <div class="active">
-                <span></span>
-                <span></span>
-                <span></span>
-            </div>
-        </nav>
+<div id="fly-main" class="">
+    <nav class="fly-nav-ico">
+        <div class="active">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+    </nav>
+
+    <section class="fly-page" id="fly-page1">
+
     </section>
+
+    <div class="fly-mask"></div>
 </div>
-<nav class="fly-nav">
-    <div>
-        <img src="./static/images/h5.png" alt="">
+<nav class="fly-nav ">
+    <div class="h5">
+        <img src="./static/images/h5.jpg" alt="">
     </div>
     <ul>
-        <li>前端总览</li>
-        <li>前端总览</li>
+        <li><a href="javascript:void(0)">前端总览</a></li>
+        <li><a href="javascript:void(0)">javascript</a></li>
+        <li><a href="javascript:void(0)">canvas</a></li>
+        <li><a href="javascript:void(0)">createjs</a></li>
+        <li><a href="javascript:void(0)">css3</a></li>
+
     </ul>
 </nav>
 
@@ -50,7 +53,7 @@
     window.loader = new SVGLoader( document.getElementById( currentLoader.id ), { speedIn : currentLoader.speedIn, easingIn : mina.easeinout } );
     window.loader.show();
 </script>
-<script src="http://localhost:4000/index.js" onload="window.loader.hide();window.loader.el.style.display='none'"></script>
-<!--<script src="./static/js/index.js" onload="window.loader.hide();window.loader.el.style.display='none'"></script>-->
+<!--<script src="http://localhost:4000/index.js" onload="window.loader.hide();window.loader.el.style.display='none'"></script>-->
+<script src="./static/js/index.js" onload="window.loader.hide();window.loader.el.style.display='none'"></script>
 </body>
 </html>
