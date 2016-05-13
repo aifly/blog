@@ -103,8 +103,8 @@ input, textarea {
 @mixin transform3d {
   -webkit-transform-style: preserve-3d;
   transform-style: preserve-3d;
-  perspective: 800px;
-  -webkit-perspective: 800px;
+  perspective: 300px;
+  -webkit-perspective: 300px;
 }
 
 @mixin displayBox($v) {
@@ -147,6 +147,8 @@ body {
 }
 $baseColor: yellowgreen !default;
 
+
+
 #fly-main{
   width:100vw;
   height:100vh;
@@ -161,6 +163,41 @@ $baseColor: yellowgreen !default;
     height:100%;
     z-index:1;
 
+    @at-root {
+      @keyframes typing { from { width: 0; } }
+      @keyframes caret { 50% { border-right-color: transparent; } }
+    }
+    .fly-js{
+      color:#fff;
+      font-family: woodcutter;
+      width: 680px;
+     /* animation: typing 5s  steps(10, end) infinite,
+      caret .5s step-end infinite alternate;*/
+      display: block;
+      margin:100px auto;
+      font-size:150px;
+      font-weight:normal;
+      text-align: center;
+      p{
+        margin:0 auto;
+        text-align: center;
+      }
+      @include pos(r);
+      .fly-border{
+        @include pos(a);
+        left:0;
+        top:0;
+        width:0;
+        height:100%;
+        border-right:4px solid #fff;
+        @include animation(typing .4s linear infinite);
+      }
+    }
+    canvas{
+      @include pos(a);
+      left: 0;
+      top:0;
+    }
 
   }
 
@@ -168,7 +205,7 @@ $baseColor: yellowgreen !default;
   @include transitionTimingFunction(cubic-bezier(0, 0.85, 0.29, 0.95));
   @include transform_origin(right);
   &.active{
-    @include transform(rotateY(-8deg) scale(1));
+    @include transform(rotateY(-3deg) scale(1));
     -webkit-filter:blur(8px);
     filter:blur(8px);
   }
@@ -227,6 +264,8 @@ $baseColor: yellowgreen !default;
       display: block;
     }
   }
+
+
 
 }
 
