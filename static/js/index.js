@@ -298,7 +298,7 @@
 	    bindEvent: function bindEvent() {
 	        var _this = this;
 
-	        this.printText((0, _utilMethodsEs6._$)('.fly-js'), 'javascript');
+	        //this.printText(_$('.fly-js'), 'javascript');
 
 	        var f = function f() {
 	            data.mask.classList.toggle('show');

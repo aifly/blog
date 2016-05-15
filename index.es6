@@ -247,7 +247,7 @@ let util = {
     },
     bindEvent(){
 
-        this.printText(_$('.fly-js'), 'javascript');
+        //this.printText(_$('.fly-js'), 'javascript');
 
         let f = ()=> {
             data.mask.classList.toggle('show');
