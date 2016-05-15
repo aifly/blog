@@ -4,6 +4,7 @@
 import './static/css/index.css';
 import bg from  './static/images/1.png';
 import {utilMethods,_$,$$} from './utilMethods.es6';
+import {Tween} from './static/libs/tween';
 
 let data = {
     main: _$('#fly-main'),
@@ -15,7 +16,7 @@ let data = {
     canvas: document.getElementById('fly-html5'),
     viewWidth: document.documentElement.clientWidth,
     viewHeight: document.documentElement.clientHeight
-}
+};
 
 
 let util = {
@@ -125,17 +126,20 @@ let util = {
             constructor(args) {
                 let {x,y,r,g,b,a,type} = args;
                 this.type = type || 'normal';
-                this.life = utilMethods.r(150, 220);
+                this.life = utilMethods.r(100, 300);
                 this.speedX = utilMethods.r(-3,3);
                 this.speedY= utilMethods.r(-3,3);
-                this.duration = utilMethods.r(4000, 5600);
+                this.duration = utilMethods.r(1000, 2000);
                 this.directionX=  utilMethods.r(0, 1) > .5;
                 this.directionY=  utilMethods.r(0, 1) > .5;
+                this.startTime =  +new Date();
                 this.wait = utilMethods.r(0, 100);
                 this.waitInow = 0;
                 this.iNow = 0;
+
                 this.x = x;
                 this.y = y;
+                this.nextPoint = {x:utilMethods.r(-60,60),y:utilMethods.r(-50,50)};
                 this.r = r;
                 this.g = g;
                 this.b = b;
@@ -148,7 +152,7 @@ let util = {
                 let circle = new createjs.Shape(),
                     dot = this;
                 this.shape = circle;
-                circle.graphics.beginFill('rgba(' + dot.r + ',' + dot.g + ',' + dot.b + ',' + dot.a + ')').drawCircle(dot.x, dot.y, 4);
+                circle.graphics.beginFill('rgba(' + dot.r + ',' + dot.g + ',' + dot.b + ',' + dot.a + ')').drawPolyStar(dot.x, dot.y,3,5);
                 container.addChild(circle);
 
                 if (this.type === 'normal' && false) {
@@ -167,22 +171,28 @@ let util = {
             move() {
                 let s = this;
 
+
                 if (s.type === 'normal') {//
 
-
-
                     s.iNow+=1;
+                    //
+
+
 
                     if (s.iNow >= s.life) {
                         s.iNow = 0;
-                       // this.direction *=-1;
-                        s.life = utilMethods.r(150, 220);
-                        this.speedX = utilMethods.r(-3,3);
-                        this.speedY= utilMethods.r(-3,.3);
+
+                        createjs.Tween.get(s.shape).to({
+                            x:s.nextPoint.x,
+                            y:s.nextPoint.y
+                        },s.duration,createjs.Ease.quintOut).call(()=>{
+                            s.nextPoint = {x:utilMethods.r(-100,100),y:utilMethods.r(-100,100)};
+                            s.duration = utilMethods.r(1000,2000);
+                            s.life = utilMethods.r(80,120);
+                        });
+
                     }
 
-                    s.shape.x += s.speedX;
-                    s.shape.y += s.speedY;
 
                 }
                 else {
@@ -195,10 +205,13 @@ let util = {
 
         let container = new createjs.Container().set({x: x, y: y}),
             circleArr = [];
+
         dots.forEach(dot=> {
            circleArr.push(new Dot({x: dot.x, y: dot.y, r: dot.r, g: dot.g, b: dot.b, a: dot.a, type: 'word'}));
         });
-        for (let i = 0; i < 1; i++) {
+
+
+        for (let i = 0; i < 440; i++) {
             let dot = dots[Math.floor(utilMethods.r(0, dots.length - 1))];
             circleArr.push(new Dot({
                 x: utilMethods.r(-x, data.viewWidth),
@@ -206,17 +219,16 @@ let util = {
                 r: dot.r,
                 g: dot.g,
                 b: dot.b,
-                a: 30,
+                a: .7,
                 type: 'normal'
             }))
         }
 
         stage.addChild(container);
-        stage.update();
+
         createjs.Ticker.on("tick", ()=> {
-           //  circleArr.forEach(c=>c.move());
-
-
+            circleArr.forEach(c=>c.move());
+            stage.update();
         });
 
 
