@@ -51,19 +51,15 @@
 
 	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
 	__webpack_require__(1);
 
-	var _staticImages1Png = __webpack_require__(5);
+	/*import bg from  './static/images/1.png';*/
 
-	var _staticImages1Png2 = _interopRequireDefault(_staticImages1Png);
+	var _utilMethodsEs6 = __webpack_require__(5);
 
-	var _utilMethodsEs6 = __webpack_require__(6);
-
-	var _staticLibsTween = __webpack_require__(7);
+	var _staticLibsTween = __webpack_require__(6);
 
 	var data = {
 	    main: (0, _utilMethodsEs6._$)('#fly-main'),
@@ -369,11 +365,13 @@
 	        }
 	    },
 	    setBg: function setBg() {
-	        var arr = [data.page1];
-	        [_staticImages1Png2['default']].forEach(function (b, i) {
-	            arr[i].style.background = 'url(./static/js/' + b + ') no-repeat center center';
-	            arr[i].style.backgroundSize = 'cover';
-	        });
+	        /* let arr = [
+	             data.page1
+	         ];
+	         [bg].forEach((b, i)=> {
+	             arr[i].style.background = 'url(./static/js/' + b + ') no-repeat center center';
+	             arr[i].style.backgroundSize = 'cover';
+	         });*/
 	    }
 	};
 
@@ -732,14 +730,6 @@
 
 /***/ },
 /* 5 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-
-	module.exports = __webpack_require__.p + "2bce7c6aa1effd0098b032845b869201.png";
-
-/***/ },
-/* 6 */
 /***/ function(module, exports) {
 
 	/**
@@ -876,7 +866,7 @@
 	module.exports = exports['default'];
 
 /***/ },
-/* 7 */
+/* 6 */
 /***/ function(module, exports) {
 
 	/**

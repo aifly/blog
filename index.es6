@@ -2,7 +2,7 @@
  created by fly on 2016/5/10 0010
  */
 import './static/css/index.css';
-import bg from  './static/images/1.png';
+/*import bg from  './static/images/1.png';*/
 import {utilMethods,_$,$$} from './utilMethods.es6';
 import {Tween} from './static/libs/tween';
 
@@ -321,13 +321,13 @@ let util = {
         }
     },
     setBg(){
-        let arr = [
+       /* let arr = [
             data.page1
         ];
         [bg].forEach((b, i)=> {
             arr[i].style.background = 'url(./static/js/' + b + ') no-repeat center center';
             arr[i].style.backgroundSize = 'cover';
-        });
+        });*/
     }
 };
 
