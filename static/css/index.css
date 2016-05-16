@@ -25,10 +25,8 @@ body {
   font-size: 14px;
   height: 100%;
   overflow: hidden;
-  -webkit-transform-style: preserve-3d;
-  transform-style: preserve-3d;
-  perspective: 300px;
-  -webkit-perspective: 300px;
+  perspective: 450px;
+  -webkit-perspective: 450px;
   background: #2e2e2e; }
 
 #fly-main {
@@ -43,6 +41,8 @@ body {
   -webkit-transform-origin: right;
   transform-origin: right; }
   #fly-main .fly-page {
+    -webkit-transform-style: preserve-3d;
+    transform-style: preserve-3d;
     position: absolute;
     left: 0;
     top: 0;
@@ -144,6 +144,7 @@ body {
   transition: transform 0.3s;
   -webkit-transform: translate3d(-14vw, 0, 0);
   transform: translate3d(-14vw, 0, 0);
+  opacity: 0;
   position: absolute;
   left: 0;
   top: 0;
@@ -155,6 +156,7 @@ body {
   -webkit-transform-origin: left;
   transform-origin: left; }
   .fly-nav.active {
+    opacity: 1 !important;
     -webkit-transition: -webkit-transform 0.2s;
     transition: transform 0.2s;
     -webkit-transform: translate3d(0, 0, 0);

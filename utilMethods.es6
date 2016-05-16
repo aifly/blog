@@ -8,8 +8,14 @@ const utilMethods = {
             return v.toString(16);
         });
     },
-    r(m, n) {
-        return (m + Math.random() * (n - m));
+    r(m, n,name) {
+        if(name){
+            return Math[name](m + Math.random() * (n - m));
+        }
+        else{
+            return  (m + Math.random() * (n - m));
+        }
+
     },
     loading(arr, fn, fnEnd){
         var len = arr.length;
