@@ -117,6 +117,9 @@
 	            }
 	        }, 400);
 	    },
+	    dis: function dis(x1, x2, y1, y2) {
+	        return Math.sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2));
+	    },
 
 	    canvasEffect: function canvasEffect(canvas) {
 	        createjs.MotionGuidePlugin.install(createjs.Tween);
@@ -128,7 +131,17 @@
 	            context = cacheCanvas.getContext('2d');
 	        cacheCanvas.width = data.viewWidth;
 	        cacheCanvas.height = data.viewHeight;
-	        cacheCanvas.style.border = '1px solid red';
+
+	        var circleCanvas = document.createElement('canvas'),
+	            circleContext = circleCanvas.getContext('2d');
+
+	        circleCanvas.width = 900;
+	        circleCanvas.height = 300;
+	        circleCanvas.style.left = '50%';
+	        circleCanvas.style.top = '50%';
+	        circleCanvas.style.marginLeft = '-450px';
+	        circleCanvas.style.marginTop = '-150px';
+	        circleCanvas.ang = 0;
 
 	        context.font = "250px Georgia";
 	        var x = (data.viewWidth - 900) / 2,
@@ -144,16 +157,25 @@
 	        context.textBaseline = 'top';
 	        context.fillText('HTML5', x, y);
 
-	        // data.page1.appendChild(cacheCanvas);
+	        data.page1.appendChild(circleCanvas);
+
+	        /* let h5Stage = new createjs.Stage(circleCanvas);
+	         let h5Container = new createjs.Container();
+	         h5Stage.addChild(h5Container);
+	         h5Stage.update();*/
 
 	        var imgData = context.getImageData(x, y, 900, 300);
-	        //context2 = canvas.getContext('2d');
+	        var context2 = canvas.getContext('2d');
 	        //context2.putImageData(imgData, x, y);
 
+	        var centerX = data.viewWidth >> 1,
+	            centerY = data.viewHeight >> 1,
+	            r = 50;
+
 	        var dots = [],
+	            gap = 8,
 	            imgDataW = imgData.width,
-	            imgDataH = imgData.height,
-	            gap = 8;
+	            imgDataH = imgData.height;
 	        for (var i = 0; i < imgDataW; i += gap) {
 	            for (var j = 0; j < imgDataH; j += gap) {
 	                var a = (i + j * imgDataW) * 4;
@@ -185,27 +207,22 @@
 	                var b = args.b;
 	                var a = args.a;
 	                var type = args.type;
-
-	                this.type = type || 'normal';
-	                this.life = _utilMethodsEs6.utilMethods.r(100, 300);
-	                this.speedX = _utilMethodsEs6.utilMethods.r(-3, 3);
-	                this.speedY = _utilMethodsEs6.utilMethods.r(-3, 3);
-	                this.duration = _utilMethodsEs6.utilMethods.r(1000, 2000);
-	                this.directionX = _utilMethodsEs6.utilMethods.r(0, 1) > .5;
-	                this.directionY = _utilMethodsEs6.utilMethods.r(0, 1) > .5;
-	                this.startTime = +new Date();
-	                this.wait = _utilMethodsEs6.utilMethods.r(0, 100);
-	                this.waitInow = 0;
-	                this.iNow = 0;
-
-	                this.x = x;
-	                this.y = y;
-	                this.nextPoint = { x: _utilMethodsEs6.utilMethods.r(-60, 60), y: _utilMethodsEs6.utilMethods.r(-50, 50) };
-	                this.r = r;
-	                this.g = g;
-	                this.b = b;
-	                this.a = a;
-	                this.create();
+	                var state = args.state;
+	                var s = this;
+	                s.type = type || 'normal';
+	                s.state = state || 'move';
+	                s.life = Math.round(_utilMethodsEs6.utilMethods.r(20, 40));
+	                s.duration = _utilMethodsEs6.utilMethods.r(1000, 2000);
+	                s.wait = _utilMethodsEs6.utilMethods.r(450, 1200);
+	                s.iNow = 0;
+	                s.x = x;
+	                s.y = y;
+	                s.nextPoint = { x: _utilMethodsEs6.utilMethods.r(-60, 60), y: _utilMethodsEs6.utilMethods.r(-50, 50) };
+	                s.r = r;
+	                s.g = g;
+	                s.b = b;
+	                s.a = a;
+	                s.create();
 	            }
 
 	            _createClass(Dot, [{
@@ -214,14 +231,18 @@
 	                    var circle = new createjs.Shape(),
 	                        dot = this;
 	                    this.shape = circle;
-	                    circle.graphics.beginFill('rgba(' + dot.r + ',' + dot.g + ',' + dot.b + ',' + dot.a + ')').drawPolyStar(dot.x, dot.y, 3, 5);
-	                    container.addChild(circle);
-
-	                    if (this.type === 'normal' && false) {
-
-	                        var path = [self.rx(), self.ry(), self.rx(), self.ry(), self.rx(), self.ry()];
-
-	                        createjs.Tween.get(this.shape, { loop: true }).to({ guide: { path: path, start: 0, end: 1 } }, this.duration).wait(this.wait).to({ guide: { path: path, start: 1, end: 0 } }, this.duration);
+	                    if (dot.type === 'word') {
+	                        //circle.graphics.beginFill('rgba(' + dot.r + ',' + dot.g + ',' + dot.b + ',' + dot.a + ')').drawPolyStar(0, 0, 4, 5, 0, -18);
+	                        circleContext.fillStyle = 'rgba(' + dot.r + ',' + dot.g + ',' + dot.b + ',' + dot.a + ')';
+	                        circleContext.beginPath();
+	                        circleContext.arc(dot.x, dot.y, 4, 0, Math.PI * 2, false);
+	                        circleContext.closePath();
+	                        circleContext.fill();
+	                    } else {
+	                        circle.graphics.beginFill('rgba(' + dot.r + ',' + dot.g + ',' + dot.b + ',' + dot.a + ')').drawCircle(0, 0, 3);
+	                        container.addChild(circle);
+	                        circle.x = dot.x;
+	                        circle.y = dot.y;
 	                    }
 	                }
 	            }, {
@@ -231,21 +252,58 @@
 
 	                    if (s.type === 'normal') {
 	                        //
-
 	                        s.iNow += 1;
-	                        //
+	                        if (s.state === 'move') {
+	                            //在整个屏幕中随机运动。
 
-	                        if (s.iNow >= s.life) {
-	                            s.iNow = 0;
+	                            if (s.iNow % s.life === 0) {
+	                                if (s.iNow % (s.life * 4) === 0) {
+	                                    s.state = 'close';
+	                                    s.iNow = 0;
+	                                }
+	                                createjs.Tween.get(s.shape).to({
+	                                    x: s.nextPoint.x,
+	                                    y: s.nextPoint.y
+	                                }, s.duration, createjs.Ease.quintOut).call(function () {
+	                                    s.nextPoint = {
+	                                        x: _utilMethodsEs6.utilMethods.r(-x, data.viewWidth) - s.x,
+	                                        y: _utilMethodsEs6.utilMethods.r(-y, data.viewHeight) - s.y
+	                                    };
+	                                    s.duration = _utilMethodsEs6.utilMethods.r(1000, 2000);
+	                                    s.life = Math.round(_utilMethodsEs6.utilMethods.r(110, 220));
+	                                });
+	                            }
+	                        } else if (s.state === 'close') {
 
-	                            createjs.Tween.get(s.shape).to({
-	                                x: s.nextPoint.x,
-	                                y: s.nextPoint.y
-	                            }, s.duration, createjs.Ease.quintOut).call(function () {
-	                                s.nextPoint = { x: _utilMethodsEs6.utilMethods.r(-100, 100), y: _utilMethodsEs6.utilMethods.r(-100, 100) };
-	                                s.duration = _utilMethodsEs6.utilMethods.r(1000, 2000);
-	                                s.life = _utilMethodsEs6.utilMethods.r(80, 120);
-	                            });
+	                            if (s.iNow % (s.life * 2) === 0) {
+
+	                                if (s.iNow % (s.life * 4) === 0) {
+	                                    s.state = 'open';
+	                                    s.iNow = 0;
+	                                }
+	                                createjs.Tween.get(s.shape).to({
+	                                    scaleX: 2,
+	                                    scaleY: 2
+	                                }, 400, createjs.Ease.easeIn).wait(s.wait).to({
+	                                    scaleX: 1,
+	                                    scaleY: 1,
+	                                    x: centerX - x, //;arr[Math.floor(utilMethods.r(0, arr.length))].x,
+	                                    y: centerY - y //arr[Math.floor(utilMethods.r(0, arr.length))].y
+	                                }, s.duration / 1.5, createjs.Ease.quintOut).call(function () {});
+	                            }
+	                        } else if (s.state === 'open') {
+	                            if (s.iNow % (s.life * 2) === 0) {
+	                                createjs.Tween.get(s.shape).wait(s.wait * 5).to({
+	                                    scaleX: 1,
+	                                    scaleY: 1,
+	                                    x: _utilMethodsEs6.utilMethods.r(-x, data.viewWidth),
+	                                    y: _utilMethodsEs6.utilMethods.r(-x, data.viewHeight) //arr[Math.floor(utilMethods.r(0, arr.length))].y
+	                                }, s.duration, createjs.Ease.quintOut).call(function () {});
+	                                if (s.iNow % (s.life * 4) === 0) {
+	                                    s.state = 'move';
+	                                    s.iNow = 0;
+	                                }
+	                            }
 	                        }
 	                    } else {}
 	                }
@@ -261,16 +319,18 @@
 	            circleArr.push(new Dot({ x: dot.x, y: dot.y, r: dot.r, g: dot.g, b: dot.b, a: dot.a, type: 'word' }));
 	        });
 
-	        for (var i = 0; i < 440; i++) {
+	        for (var i = 0; i < 600; i++) {
 	            var dot = dots[Math.floor(_utilMethodsEs6.utilMethods.r(0, dots.length - 1))];
+
 	            circleArr.push(new Dot({
 	                x: _utilMethodsEs6.utilMethods.r(-x, data.viewWidth),
 	                y: _utilMethodsEs6.utilMethods.r(-y, data.viewHeight),
 	                r: dot.r,
 	                g: dot.g,
 	                b: dot.b,
-	                a: .7,
-	                type: 'normal'
+	                a: .5,
+	                type: 'normal',
+	                state: 'close'
 	            }));
 	        }
 
@@ -280,20 +340,12 @@
 	            circleArr.forEach(function (c) {
 	                return c.move();
 	            });
+	            circleCanvas.style.transform = "rotateY(" + circleCanvas.ang++ + "deg)";
 	            stage.update();
 	        });
 
 	        /*
 	         */
-	    },
-	    rx: function rx() {
-	        return Math.random() * 1000 + 10;
-	    },
-	    ry: function ry() {
-	        return Math.random() * 300 + 10;
-	    },
-	    rc: function rc() {
-	        return Math.round(Math.random() * 0xED + 0x12).toString(16);
 	    },
 	    bindEvent: function bindEvent() {
 	        var _this = this;
@@ -366,11 +418,11 @@
 	    },
 	    setBg: function setBg() {
 	        /* let arr = [
-	             data.page1
+	         data.page1
 	         ];
 	         [bg].forEach((b, i)=> {
-	             arr[i].style.background = 'url(./static/js/' + b + ') no-repeat center center';
-	             arr[i].style.backgroundSize = 'cover';
+	         arr[i].style.background = 'url(./static/js/' + b + ') no-repeat center center';
+	         arr[i].style.backgroundSize = 'cover';
 	         });*/
 	    }
 	};
@@ -416,7 +468,7 @@
 
 
 	// module
-	exports.push([module.id, "html, body, div, p, ul, li, ol, dl, dt, dd, header, footer, video, h1, h2, h3, h4, canvas, section, figure {\r\n  padding: 0;\r\n  margin: 0; }\r\n\r\na {\r\n  text-decoration: none; }\r\n\r\nli {\r\n  list-style: none; }\r\n\r\nhtml, body {\r\n  height: 100%; }\r\n\r\nimg {\r\n  border: none;\r\n  vertical-align: top;\r\n  width: 100%;\r\n  height: auto; }\r\n\r\ninput, textarea {\r\n  outline: none; }\r\n\r\nbody {\r\n  font-family: 'Microsoft Yahei', Tahoma, Helvetica, Arial, sans-serif;\r\n  font-size: 14px;\r\n  height: 100%;\r\n  overflow: hidden;\r\n  -webkit-transform-style: preserve-3d;\r\n  transform-style: preserve-3d;\r\n  perspective: 300px;\r\n  -webkit-perspective: 300px;\r\n  background: #2e2e2e; }\r\n\r\n#fly-main {\r\n  width: 100vw;\r\n  height: 100vh;\r\n  position: relative;\r\n  z-index: 1;\r\n  -webkit-transition: -webkit-transform 0.3s;\r\n  transition: transform 0.3s;\r\n  -webkit-transition-timing-function: cubic-bezier(0, 0.85, 0.29, 0.95);\r\n  transition-timing-function: cubic-bezier(0, 0.85, 0.29, 0.95);\r\n  -webkit-transform-origin: right;\r\n  transform-origin: right; }\r\n  #fly-main .fly-page {\r\n    position: absolute;\r\n    left: 0;\r\n    top: 0;\r\n    width: 100%;\r\n    height: 100%;\r\n    z-index: 1; }\r\n@keyframes typing {\r\n  from {\r\n    width: 0; } }\r\n@keyframes caret {\r\n  50% {\r\n    border-right-color: transparent; } }\r\n    #fly-main .fly-page .fly-js {\r\n      color: #fff;\r\n      font-family: woodcutter;\r\n      width: 680px;\r\n      /* animation: typing 5s  steps(10, end) infinite,\r\n       caret .5s step-end infinite alternate;*/\r\n      display: block;\r\n      margin: 100px auto;\r\n      font-size: 150px;\r\n      font-weight: normal;\r\n      text-align: center;\r\n      position: relative; }\r\n      #fly-main .fly-page .fly-js p {\r\n        margin: 0 auto;\r\n        text-align: center; }\r\n      #fly-main .fly-page .fly-js .fly-border {\r\n        position: absolute;\r\n        left: 0;\r\n        top: 0;\r\n        width: 0;\r\n        height: 100%;\r\n        border-right: 4px solid #fff;\r\n        -webkit-animation: typing 0.4s linear infinite;\r\n        animation: typing 0.4s linear infinite; }\r\n    #fly-main .fly-page canvas {\r\n      position: absolute;\r\n      left: 0;\r\n      top: 0; }\r\n  #fly-main.active {\r\n    -webkit-transform: rotateY(-3deg) scale(1);\r\n    transform: rotateY(-3deg) scale(1);\r\n    -webkit-filter: blur(8px);\r\n    filter: blur(8px); }\r\n  #fly-main .fly-nav-ico {\r\n    flex-grow: 1;\r\n    width: 60px;\r\n    height: 60px;\r\n    cursor: pointer;\r\n    position: absolute;\r\n    z-index: 10000;\r\n    margin: 2vw;\r\n    -webkit-transform: rotate(180deg);\r\n    transform: rotate(180deg);\r\n    background: yellowgreen;\r\n    border-radius: 50%;\r\n    -webkit-transition: -webkit-transform 0.1s;\r\n    transition: transform 0.1s; }\r\n    #fly-main .fly-nav-ico.shadow {\r\n      box-shadow: 0 0 20px rgba(75, 132, 109, 0.5), 0 0 40px rgba(5, 138, 84, 0.5);\r\n      -webkit-transform: scale(0.9) rotate(180deg);\r\n      transform: scale(0.9) rotate(180deg); }\r\n    #fly-main .fly-nav-ico div {\r\n      width: 100%;\r\n      height: 58%;\r\n      position: absolute;\r\n      top: 50%;\r\n      -webkit-transform: translate3d(0, -67%, 0);\r\n      transform: translate3d(0, -67%, 0);\r\n      text-align: center;\r\n      padding-top: 5px;\r\n      box-sizing: border-box; }\r\n    #fly-main .fly-nav-ico span {\r\n      -webkit-transition: 0.2s;\r\n      transition: 0.2s;\r\n      margin: 7px auto;\r\n      width: 35px;\r\n      height: 3px;\r\n      background: #fff;\r\n      display: block;\r\n      border-radius: 3px; }\r\n  #fly-main .fly-mask {\r\n    position: absolute;\r\n    left: 0;\r\n    top: 0;\r\n    z-index: 10000;\r\n    background: rgba(0, 0, 0, 0.5);\r\n    width: 100%;\r\n    height: 100%;\r\n    display: none; }\r\n    #fly-main .fly-mask.show {\r\n      display: block; }\r\n\r\n.fly-nav {\r\n  -webkit-transition-timing-function: cubic-bezier(0, 0.85, 0.29, 0.95);\r\n  transition-timing-function: cubic-bezier(0, 0.85, 0.29, 0.95);\r\n  -webkit-transition: -webkit-transform 0.3s;\r\n  transition: transform 0.3s;\r\n  -webkit-transform: translate3d(-14vw, 0, 0);\r\n  transform: translate3d(-14vw, 0, 0);\r\n  position: absolute;\r\n  left: 0;\r\n  top: 0;\r\n  width: 14vw;\r\n  z-index: 100;\r\n  height: 100vh;\r\n  background: #9cf39b;\r\n  color: #000;\r\n  -webkit-transform-origin: left;\r\n  transform-origin: left; }\r\n  .fly-nav.active {\r\n    -webkit-transition: -webkit-transform 0.2s;\r\n    transition: transform 0.2s;\r\n    -webkit-transform: translate3d(0, 0, 0);\r\n    transform: translate3d(0, 0, 0); }\r\n  .fly-nav ul {\r\n    overflow: hidden;\r\n    width: 100%; }\r\n    .fly-nav ul li {\r\n      height: 50px;\r\n      text-align: center;\r\n      line-height: 50px;\r\n      font-size: 1vw;\r\n      -webkit-transition: -webkit-transform 0.4s;\r\n      transition: transform 0.4s;\r\n      position: relative;\r\n      -webkit-transition-delay: 0.4s;\r\n      transition-delay: 0.4s; }\r\n      .fly-nav ul li :before {\r\n        content: '';\r\n        position: absolute;\r\n        left: 0;\r\n        bottom: 0;\r\n        width: 100%;\r\n        height: 1px;\r\n        background: -webkit-gradient(linear, left top, right top, from(rgba(204, 204, 204, 0.2)), color-stop(0.5, #cccccc), to(rgba(204, 204, 204, 0.2)));\r\n        background: -moz-linear-gradient(left, rgba(204, 204, 204, 0.2), #cccccc 50%, rgba(204, 204, 204, 0.2));\r\n        background: -ms-linear-gradient(left, rgba(204, 204, 204, 0.2), #cccccc 50%, rgba(204, 204, 204, 0.2)); }\r\n      .fly-nav ul li:nth-of-type(2n) {\r\n        -webkit-transform: translate3d(-44vw, 0, 0);\r\n        transform: translate3d(-44vw, 0, 0); }\r\n      .fly-nav ul li:nth-of-type(2n+1) {\r\n        -webkit-transform: translate3d(44vw, 0, 0);\r\n        transform: translate3d(44vw, 0, 0); }\r\n      .fly-nav ul li.active {\r\n        -webkit-transform: translate3d(0, 0, 0);\r\n        transform: translate3d(0, 0, 0); }\r\n      .fly-nav ul li:nth-of-type(1) {\r\n        -webkit-transition-delay: 100ms;\r\n        transition-delay: 100ms; }\r\n      .fly-nav ul li:nth-of-type(2) {\r\n        -webkit-transition-delay: 200ms;\r\n        transition-delay: 200ms; }\r\n      .fly-nav ul li:nth-of-type(3) {\r\n        -webkit-transition-delay: 300ms;\r\n        transition-delay: 300ms; }\r\n      .fly-nav ul li:nth-of-type(4) {\r\n        -webkit-transition-delay: 400ms;\r\n        transition-delay: 400ms; }\r\n      .fly-nav ul li:nth-of-type(5) {\r\n        -webkit-transition-delay: 500ms;\r\n        transition-delay: 500ms; }\r\n      .fly-nav ul li a {\r\n        color: #000;\r\n        display: block;\r\n        width: 100%;\r\n        height: 100%; }\r\n\r\n/*# sourceMappingURL=index.css.map */\r\n", ""]);
+	exports.push([module.id, "html, body, div, p, ul, li, ol, dl, dt, dd, header, footer, video, h1, h2, h3, h4, canvas, section, figure {\r\n  padding: 0;\r\n  margin: 0; }\r\n\r\na {\r\n  text-decoration: none; }\r\n\r\nli {\r\n  list-style: none; }\r\n\r\nhtml, body {\r\n  height: 100%; }\r\n\r\nimg {\r\n  border: none;\r\n  vertical-align: top;\r\n  width: 100%;\r\n  height: auto; }\r\n\r\ninput, textarea {\r\n  outline: none; }\r\n\r\nbody {\r\n  font-family: 'Microsoft Yahei', Tahoma, Helvetica, Arial, sans-serif;\r\n  font-size: 14px;\r\n  height: 100%;\r\n  overflow: hidden;\r\n  perspective: 450px;\r\n  -webkit-perspective: 450px;\r\n  background: #2e2e2e; }\r\n\r\n#fly-main {\r\n  width: 100vw;\r\n  height: 100vh;\r\n  position: relative;\r\n  z-index: 1;\r\n  -webkit-transition: -webkit-transform 0.3s;\r\n  transition: transform 0.3s;\r\n  -webkit-transition-timing-function: cubic-bezier(0, 0.85, 0.29, 0.95);\r\n  transition-timing-function: cubic-bezier(0, 0.85, 0.29, 0.95);\r\n  -webkit-transform-origin: right;\r\n  transform-origin: right; }\r\n  #fly-main .fly-page {\r\n    -webkit-transform-style: preserve-3d;\r\n    transform-style: preserve-3d;\r\n    position: absolute;\r\n    left: 0;\r\n    top: 0;\r\n    width: 100%;\r\n    height: 100%;\r\n    z-index: 1; }\r\n@keyframes typing {\r\n  from {\r\n    width: 0; } }\r\n@keyframes caret {\r\n  50% {\r\n    border-right-color: transparent; } }\r\n    #fly-main .fly-page .fly-js {\r\n      color: #fff;\r\n      font-family: woodcutter;\r\n      width: 680px;\r\n      /* animation: typing 5s  steps(10, end) infinite,\r\n       caret .5s step-end infinite alternate;*/\r\n      display: block;\r\n      margin: 100px auto;\r\n      font-size: 150px;\r\n      font-weight: normal;\r\n      text-align: center;\r\n      position: relative; }\r\n      #fly-main .fly-page .fly-js p {\r\n        margin: 0 auto;\r\n        text-align: center; }\r\n      #fly-main .fly-page .fly-js .fly-border {\r\n        position: absolute;\r\n        left: 0;\r\n        top: 0;\r\n        width: 0;\r\n        height: 100%;\r\n        border-right: 4px solid #fff;\r\n        -webkit-animation: typing 0.4s linear infinite;\r\n        animation: typing 0.4s linear infinite; }\r\n    #fly-main .fly-page canvas {\r\n      position: absolute;\r\n      left: 0;\r\n      top: 0; }\r\n  #fly-main.active {\r\n    -webkit-transform: rotateY(-3deg) scale(1);\r\n    transform: rotateY(-3deg) scale(1);\r\n    -webkit-filter: blur(8px);\r\n    filter: blur(8px); }\r\n  #fly-main .fly-nav-ico {\r\n    flex-grow: 1;\r\n    width: 60px;\r\n    height: 60px;\r\n    cursor: pointer;\r\n    position: absolute;\r\n    z-index: 10000;\r\n    margin: 2vw;\r\n    -webkit-transform: rotate(180deg);\r\n    transform: rotate(180deg);\r\n    background: yellowgreen;\r\n    border-radius: 50%;\r\n    -webkit-transition: -webkit-transform 0.1s;\r\n    transition: transform 0.1s; }\r\n    #fly-main .fly-nav-ico.shadow {\r\n      box-shadow: 0 0 20px rgba(75, 132, 109, 0.5), 0 0 40px rgba(5, 138, 84, 0.5);\r\n      -webkit-transform: scale(0.9) rotate(180deg);\r\n      transform: scale(0.9) rotate(180deg); }\r\n    #fly-main .fly-nav-ico div {\r\n      width: 100%;\r\n      height: 58%;\r\n      position: absolute;\r\n      top: 50%;\r\n      -webkit-transform: translate3d(0, -67%, 0);\r\n      transform: translate3d(0, -67%, 0);\r\n      text-align: center;\r\n      padding-top: 5px;\r\n      box-sizing: border-box; }\r\n    #fly-main .fly-nav-ico span {\r\n      -webkit-transition: 0.2s;\r\n      transition: 0.2s;\r\n      margin: 7px auto;\r\n      width: 35px;\r\n      height: 3px;\r\n      background: #fff;\r\n      display: block;\r\n      border-radius: 3px; }\r\n  #fly-main .fly-mask {\r\n    position: absolute;\r\n    left: 0;\r\n    top: 0;\r\n    z-index: 10000;\r\n    background: rgba(0, 0, 0, 0.5);\r\n    width: 100%;\r\n    height: 100%;\r\n    display: none; }\r\n    #fly-main .fly-mask.show {\r\n      display: block; }\r\n\r\n.fly-nav {\r\n  -webkit-transition-timing-function: cubic-bezier(0, 0.85, 0.29, 0.95);\r\n  transition-timing-function: cubic-bezier(0, 0.85, 0.29, 0.95);\r\n  -webkit-transition: -webkit-transform 0.3s;\r\n  transition: transform 0.3s;\r\n  -webkit-transform: translate3d(-14vw, 0, 0);\r\n  transform: translate3d(-14vw, 0, 0);\r\n  opacity: 0;\r\n  position: absolute;\r\n  left: 0;\r\n  top: 0;\r\n  width: 14vw;\r\n  z-index: 100;\r\n  height: 100vh;\r\n  background: #9cf39b;\r\n  color: #000;\r\n  -webkit-transform-origin: left;\r\n  transform-origin: left; }\r\n  .fly-nav.active {\r\n    opacity: 1 !important;\r\n    -webkit-transition: -webkit-transform 0.2s;\r\n    transition: transform 0.2s;\r\n    -webkit-transform: translate3d(0, 0, 0);\r\n    transform: translate3d(0, 0, 0); }\r\n  .fly-nav ul {\r\n    overflow: hidden;\r\n    width: 100%; }\r\n    .fly-nav ul li {\r\n      height: 50px;\r\n      text-align: center;\r\n      line-height: 50px;\r\n      font-size: 1vw;\r\n      -webkit-transition: -webkit-transform 0.4s;\r\n      transition: transform 0.4s;\r\n      position: relative;\r\n      -webkit-transition-delay: 0.4s;\r\n      transition-delay: 0.4s; }\r\n      .fly-nav ul li :before {\r\n        content: '';\r\n        position: absolute;\r\n        left: 0;\r\n        bottom: 0;\r\n        width: 100%;\r\n        height: 1px;\r\n        background: -webkit-gradient(linear, left top, right top, from(rgba(204, 204, 204, 0.2)), color-stop(0.5, #cccccc), to(rgba(204, 204, 204, 0.2)));\r\n        background: -moz-linear-gradient(left, rgba(204, 204, 204, 0.2), #cccccc 50%, rgba(204, 204, 204, 0.2));\r\n        background: -ms-linear-gradient(left, rgba(204, 204, 204, 0.2), #cccccc 50%, rgba(204, 204, 204, 0.2)); }\r\n      .fly-nav ul li:nth-of-type(2n) {\r\n        -webkit-transform: translate3d(-44vw, 0, 0);\r\n        transform: translate3d(-44vw, 0, 0); }\r\n      .fly-nav ul li:nth-of-type(2n+1) {\r\n        -webkit-transform: translate3d(44vw, 0, 0);\r\n        transform: translate3d(44vw, 0, 0); }\r\n      .fly-nav ul li.active {\r\n        -webkit-transform: translate3d(0, 0, 0);\r\n        transform: translate3d(0, 0, 0); }\r\n      .fly-nav ul li:nth-of-type(1) {\r\n        -webkit-transition-delay: 100ms;\r\n        transition-delay: 100ms; }\r\n      .fly-nav ul li:nth-of-type(2) {\r\n        -webkit-transition-delay: 200ms;\r\n        transition-delay: 200ms; }\r\n      .fly-nav ul li:nth-of-type(3) {\r\n        -webkit-transition-delay: 300ms;\r\n        transition-delay: 300ms; }\r\n      .fly-nav ul li:nth-of-type(4) {\r\n        -webkit-transition-delay: 400ms;\r\n        transition-delay: 400ms; }\r\n      .fly-nav ul li:nth-of-type(5) {\r\n        -webkit-transition-delay: 500ms;\r\n        transition-delay: 500ms; }\r\n      .fly-nav ul li a {\r\n        color: #000;\r\n        display: block;\r\n        width: 100%;\r\n        height: 100%; }\r\n\r\n/*# sourceMappingURL=index.css.map */\r\n", ""]);
 
 	// exports
 
@@ -748,8 +800,12 @@
 	            return v.toString(16);
 	        });
 	    },
-	    r: function r(m, n) {
-	        return m + Math.random() * (n - m);
+	    r: function r(m, n, name) {
+	        if (name) {
+	            return Math[name](m + Math.random() * (n - m));
+	        } else {
+	            return m + Math.random() * (n - m);
+	        }
 	    },
 	    loading: function loading(arr, fn, fnEnd) {
 	        var len = arr.length;

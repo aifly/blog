@@ -64,6 +64,9 @@ let util = {
             }
         }, 400);
     },
+    dis(x1, x2, y1, y2){
+        return Math.sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2));
+    },
 
     canvasEffect(canvas){
         createjs.MotionGuidePlugin.install(createjs.Tween);
@@ -75,7 +78,19 @@ let util = {
             context = cacheCanvas.getContext('2d');
         cacheCanvas.width = data.viewWidth;
         cacheCanvas.height = data.viewHeight;
-        cacheCanvas.style.border = '1px solid red'
+
+        let circleCanvas = document.createElement('canvas'),
+            circleContext = circleCanvas.getContext('2d');
+
+         circleCanvas.width = 900;
+         circleCanvas.height = 300;
+        circleCanvas.style.left = '50%';
+        circleCanvas.style.top = '50%';
+        circleCanvas.style.marginLeft = '-450px';
+        circleCanvas.style.marginTop = '-150px';
+        circleCanvas.ang = 0 ;
+
+
 
         context.font = "250px Georgia";
         let x = (data.viewWidth - 900) / 2,
@@ -91,17 +106,28 @@ let util = {
         context.textBaseline = 'top';
         context.fillText('HTML5', x, y);
 
-        // data.page1.appendChild(cacheCanvas);
+        data.page1.appendChild(circleCanvas);
+
+       /* let h5Stage = new createjs.Stage(circleCanvas);
+        let h5Container = new createjs.Container();
+        h5Stage.addChild(h5Container);
+        h5Stage.update();*/
 
         let imgData = context.getImageData(x, y, 900, 300);
-        //context2 = canvas.getContext('2d');
+        let context2 = canvas.getContext('2d');
         //context2.putImageData(imgData, x, y);
 
 
+        let centerX = data.viewWidth >> 1,
+            centerY = data.viewHeight >> 1,
+            r = 50;
+
+
+
         let dots = [],
+            gap = 8,
             imgDataW = imgData.width,
-            imgDataH = imgData.height,
-            gap = 8;
+            imgDataH = imgData.height;
         for (let i = 0; i < imgDataW; i += gap) {
             for (let j = 0; j < imgDataH; j += gap) {
                 let a = (i + j * imgDataW) * 4;
@@ -124,27 +150,22 @@ let util = {
 
         class Dot {
             constructor(args) {
-                let {x,y,r,g,b,a,type} = args;
-                this.type = type || 'normal';
-                this.life = utilMethods.r(100, 300);
-                this.speedX = utilMethods.r(-3,3);
-                this.speedY= utilMethods.r(-3,3);
-                this.duration = utilMethods.r(1000, 2000);
-                this.directionX=  utilMethods.r(0, 1) > .5;
-                this.directionY=  utilMethods.r(0, 1) > .5;
-                this.startTime =  +new Date();
-                this.wait = utilMethods.r(0, 100);
-                this.waitInow = 0;
-                this.iNow = 0;
-
-                this.x = x;
-                this.y = y;
-                this.nextPoint = {x:utilMethods.r(-60,60),y:utilMethods.r(-50,50)};
-                this.r = r;
-                this.g = g;
-                this.b = b;
-                this.a = a;
-                this.create();
+                let {x,y,r,g,b,a,type,state} = args,
+                    s = this;
+                s.type = type || 'normal';
+                s.state = state || 'move';
+                s.life = Math.round(utilMethods.r(20, 40));
+                s.duration = utilMethods.r(1000, 2000);
+                s.wait = utilMethods.r(450, 1200);
+                s.iNow = 0;
+                s.x = x;
+                s.y = y;
+                s.nextPoint = {x: utilMethods.r(-60, 60), y: utilMethods.r(-50, 50)};
+                s.r = r;
+                s.g = g;
+                s.b = b;
+                s.a = a;
+                s.create();
 
             }
 
@@ -152,98 +173,140 @@ let util = {
                 let circle = new createjs.Shape(),
                     dot = this;
                 this.shape = circle;
-                circle.graphics.beginFill('rgba(' + dot.r + ',' + dot.g + ',' + dot.b + ',' + dot.a + ')').drawPolyStar(dot.x, dot.y,3,5);
-                container.addChild(circle);
-
-                if (this.type === 'normal' && false) {
-
-                    let path = [self.rx(), self.ry(), self.rx(), self.ry(), self.rx(), self.ry()];
-
-                    createjs.Tween.get(this.shape, {loop: true})
-                        .to({guide: {path: path, start: 0, end: 1}}, this.duration)
-                        .wait(this.wait)
-                        .to({guide: {path: path, start: 1, end: 0}}, this.duration);
-
+                if (dot.type === 'word') {
+                    //circle.graphics.beginFill('rgba(' + dot.r + ',' + dot.g + ',' + dot.b + ',' + dot.a + ')').drawPolyStar(0, 0, 4, 5, 0, -18);
+                    circleContext.fillStyle = 'rgba(' + dot.r + ',' + dot.g + ',' + dot.b + ',' + dot.a + ')';
+                    circleContext.beginPath();
+                    circleContext.arc(dot.x,dot.y,4,0,Math.PI*2,false);
+                    circleContext.closePath();
+                    circleContext.fill();
+                }
+                else {
+                    circle.graphics.beginFill('rgba(' + dot.r + ',' + dot.g + ',' + dot.b + ',' + dot.a + ')').drawCircle(0, 0, 3);
+                    container.addChild(circle);
+                    circle.x = dot.x;
+                    circle.y = dot.y;
                 }
 
+
+
+
             }
+
 
             move() {
                 let s = this;
 
-
                 if (s.type === 'normal') {//
+                    s.iNow += 1;
+                    if (s.state === 'move') {//在整个屏幕中随机运动。
 
-                    s.iNow+=1;
-                    //
-
-
-
-                    if (s.iNow >= s.life) {
-                        s.iNow = 0;
-
-                        createjs.Tween.get(s.shape).to({
-                            x:s.nextPoint.x,
-                            y:s.nextPoint.y
-                        },s.duration,createjs.Ease.quintOut).call(()=>{
-                            s.nextPoint = {x:utilMethods.r(-100,100),y:utilMethods.r(-100,100)};
-                            s.duration = utilMethods.r(1000,2000);
-                            s.life = utilMethods.r(80,120);
-                        });
+                        if (s.iNow % s.life === 0) {
+                            if (s.iNow % (s.life * 4) === 0) {
+                                s.state = 'close';
+                                s.iNow = 0;
+                            }
+                            createjs.Tween.get(s.shape).to({
+                                x: s.nextPoint.x,
+                                y: s.nextPoint.y
+                            }, s.duration, createjs.Ease.quintOut).call(()=> {
+                                s.nextPoint = {
+                                    x: utilMethods.r(-x, data.viewWidth) - s.x,
+                                    y: utilMethods.r(-y, data.viewHeight) - s.y
+                                };
+                                s.duration = utilMethods.r(1000, 2000);
+                                s.life = Math.round(utilMethods.r(110, 220));
+                            });
+                        }
 
                     }
+                    else if (s.state === 'close') {
 
+                        if (s.iNow % (s.life * 2 ) === 0) {
+
+                            if (s.iNow % (s.life * 4) === 0) {
+                                s.state = 'open';
+                                s.iNow = 0;
+                            }
+                            createjs.Tween.get(s.shape)
+                                .to({
+                                    scaleX: 2,
+                                    scaleY: 2
+                                }, 400, createjs.Ease.easeIn)
+                                .wait(s.wait)
+                                .to({
+                                    scaleX: 1,
+                                    scaleY: 1,
+                                    x: centerX - x,//;arr[Math.floor(utilMethods.r(0, arr.length))].x,
+                                    y: centerY - y//arr[Math.floor(utilMethods.r(0, arr.length))].y
+                                }, s.duration / 1.5, createjs.Ease.quintOut).call(()=> {
+
+                            });
+                        }
+
+                    }
+                    else if (s.state === 'open') {
+                        if (s.iNow % (s.life * 2 ) === 0) {
+                            createjs.Tween.get(s.shape)
+                                .wait(s.wait * 5)
+                                .to({
+                                    scaleX: 1,
+                                    scaleY: 1,
+                                    x: utilMethods.r(-x, data.viewWidth),
+                                    y: utilMethods.r(-x, data.viewHeight)//arr[Math.floor(utilMethods.r(0, arr.length))].y
+                                }, s.duration, createjs.Ease.quintOut).call(()=> {
+
+                            });
+                            if (s.iNow % (s.life * 4) === 0) {
+                                s.state = 'move';
+                                s.iNow = 0;
+                            }
+                        }
+
+                    }
 
                 }
                 else {
 
                 }
-
             }
-
         }
+
 
         let container = new createjs.Container().set({x: x, y: y}),
             circleArr = [];
 
         dots.forEach(dot=> {
-           circleArr.push(new Dot({x: dot.x, y: dot.y, r: dot.r, g: dot.g, b: dot.b, a: dot.a, type: 'word'}));
+            circleArr.push(new Dot({x: dot.x, y: dot.y, r: dot.r, g: dot.g, b: dot.b, a: dot.a, type: 'word'}));
         });
 
-
-        for (let i = 0; i < 440; i++) {
+        for (let i = 0; i < 600; i++) {
             let dot = dots[Math.floor(utilMethods.r(0, dots.length - 1))];
+
             circleArr.push(new Dot({
                 x: utilMethods.r(-x, data.viewWidth),
                 y: utilMethods.r(-y, data.viewHeight),
                 r: dot.r,
                 g: dot.g,
                 b: dot.b,
-                a: .7,
-                type: 'normal'
+                a: .5,
+                type: 'normal',
+                state: 'close'
             }))
         }
+
 
         stage.addChild(container);
 
         createjs.Ticker.on("tick", ()=> {
             circleArr.forEach(c=>c.move());
+            circleCanvas.style.transform= "rotateY("+(circleCanvas.ang++)+"deg)";
             stage.update();
         });
-
 
         /*
          */
 
-    },
-    rx() {
-        return Math.random() * 1000 + 10;
-    }
-    , ry() {
-        return Math.random() * 300 + 10;
-    }
-    , rc() {
-        return Math.round(Math.random() * 0xED + 0x12).toString(16);
     },
     bindEvent(){
 
@@ -321,13 +384,13 @@ let util = {
         }
     },
     setBg(){
-       /* let arr = [
-            data.page1
-        ];
-        [bg].forEach((b, i)=> {
-            arr[i].style.background = 'url(./static/js/' + b + ') no-repeat center center';
-            arr[i].style.backgroundSize = 'cover';
-        });*/
+        /* let arr = [
+         data.page1
+         ];
+         [bg].forEach((b, i)=> {
+         arr[i].style.background = 'url(./static/js/' + b + ') no-repeat center center';
+         arr[i].style.backgroundSize = 'cover';
+         });*/
     }
 };
 

@@ -104,8 +104,12 @@ input, textarea {
 @mixin transform3d {
   -webkit-transform-style: preserve-3d;
   transform-style: preserve-3d;
-  perspective: 300px;
-  -webkit-perspective: 300px;
+
+}
+
+@mixin perspective($v){
+  perspective: $v;
+  -webkit-perspective:$v;
 }
 
 @mixin displayBox($v) {
@@ -143,7 +147,8 @@ body {
   font-size: 14px;
   height: 100%;
   overflow: hidden;
-  @include transform3d;
+
+  @include perspective(450px);
   background:#2e2e2e;
 }
 $baseColor: yellowgreen !default;
@@ -155,8 +160,10 @@ $baseColor: yellowgreen !default;
   height:100vh;
   @include pos(r);
   z-index: 1;
-
+  @include transform3d;
   .fly-page{
+    @include transform3d;
+
     @include pos(a);
     left:0;
     top:0;
@@ -266,15 +273,16 @@ $baseColor: yellowgreen !default;
     }
   }
 
-
-
 }
+
 
 .fly-nav{
   @include transitionTimingFunction(cubic-bezier(0, 0.85, 0.29, 0.95));
   @include transition_transform(.3s);
   @include transform(translate3d(-14vw,0,0));
+  opacity: 0;
   &.active{
+    opacity: 1 !important;
     @include transition_transform(.2s);
     @include transform(translate3d(0,0,0));
   };
