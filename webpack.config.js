@@ -4,7 +4,8 @@
 
 module.exports = {
     entry:{
-        index:"./index.es6"
+        index:"./index.es6",
+        clock:"./clock.es6"
     },
     output:{
         path:"./static/js/",
