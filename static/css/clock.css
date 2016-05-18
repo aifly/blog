@@ -24,6 +24,12 @@ body {
   font-family: 'Microsoft Yahei', Tahoma, Helvetica, Arial, sans-serif;
   font-size: 14px;
   height: 100%;
-  overflow: hidden; }
+  overflow: hidden;
+  background: #2e2e2e; }
+
+#fly-main canvas {
+  position: absolute;
+  left: 0;
+  top: 0; }
 
 /*# sourceMappingURL=clock.css.map */

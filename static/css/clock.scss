@@ -137,6 +137,15 @@ body {
   font-size: 14px;
   height: 100%;
   overflow: hidden;
+  background: #2e2e2e;
+}
+
+#fly-main{
+  canvas{
+    @include pos(a);
+    left: 0;
+    top:0;
+  }
 }
 
  
