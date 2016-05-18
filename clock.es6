@@ -109,8 +109,9 @@ let util = {
                 s.b = b;
                 s.a = a;
                 s.type = type;
+                s.ripe =false;
                 s.speedY = -utilMethods.r(30, 40, 'round');
-                s.speedX = -utilMethods.r(2, 10, 'round');
+                s.speedX = -utilMethods.r(2, 6, 'round');
 
                 s.create();
             };
@@ -134,38 +135,49 @@ let util = {
         this.Ball = Ball;
 
 
-        context.clearRect(0, 0, data.viewWidth, data.viewHeight);
+        ///context.clearRect(0, 0, data.viewWidth, data.viewHeight);
         let marginLeft = 150,
             containerX = (data.viewWidth - 1200) / 2;
 
 
         this.render(secContext, width, height, containerX, offTop);
 
+
         setInterval(()=> {
-            // context.clearRect(0, 0, data.viewWidth, data.viewHeight);
-
-
-            this.ballArr.forEach((b)=> {
-                b.ripe = true;
-            });
-
             this.ballArr.forEach((b, i)=> {
-                b.ripe = true && b.type === 'seconds' && this.moveBallArr.push(this.ballArr.splice(i, 1)[0]);
+
+                if(!b.ripe &&  b.type === 'seconds'){
+                    //this.ballArr.splice(i, 1);
+                    this.moveBallArr.push(b);
+                }
+
             });
-            this.renderSec('seconds', secContext, width, height, containerX, offTop);
+
+
+           let {seconds,mins} = this.renderSec('seconds', secContext, width, height, containerX, offTop);
+
+/*            if(seconds === "00"){
+                this.ballArr.forEach((b, i)=> {
+                    if(b.type === 'mins'){
+                        this.moveBallArr.push(b);
+                    }
+                });
+                this.renderSec('mins', secContext, width, height, containerX, offTop)
+            }*/
+
         }, 1000);
 
 
         createjs.Ticker.on('tick', ()=> {
 
             this.moveBallArr.forEach((ball, i)=> {
-                ball.speedY += 8;
+                ball.speedY += 5;
 
                 let T = ball.shape.y + ball.speedY;
 
-                if (T > data.viewHeight - 4) {
-                    T = data.viewHeight - 4 ;
-                    ball.speedY *= -.75;
+                if (T > data.viewHeight - 8) {
+                    T = data.viewHeight - 8 ;
+                    ball.speedY *= -.76;
                 }
 
                 if (Math.abs(ball.speedY) < 4 && T >= data.viewHeight - offTop) {
@@ -174,13 +186,19 @@ let util = {
                 }
                 ball.shape.scaleX=2;
                 ball.shape.scaleY=2;
-                ball.shape.x += ball.speedX * 1.4;
+                ball.shape.x += ball.speedX;
                 ball.shape.y = T;
 
-                if (ball.shape.x <= -data.viewWidth/2) {
+                if (ball.shape.x <= 0) {
                     stage.removeChild(ball.shape);
                     ball = null;
-                    this.moveBallArr.splice(i, 1);
+                    let b= this.moveBallArr.splice(i, 1)[0];
+                    this.ballArr.forEach((bb,j)=>{
+                        if(bb === b){
+                            this.ballArr.splice(j,1);
+                        }
+                    })
+
                 }
 
                 ///console.log(this.moveBallArr.length)
@@ -243,10 +261,13 @@ let util = {
                 break;
         }
         this.update(current, type, secContext, width, height, containerX + (marginLeft + width) * 2, offTop); //秒
+
+        return {seconds,mins}
     },
 
 
     update(time, type, offContext, width, height, offLeft, offTop){
+
         this.dots = this.fillTime(time, offContext, width, height);
 
         this.dots.forEach((dot, i)=> {
