@@ -80,24 +80,18 @@ let util = {
         window.arr = this.moveBallArr;
 
         let color = secContext.createLinearGradient(0, 0, secCanvas.width, secCanvas.height);
-        color.addColorStop(0, "#e2b722");
-        color.addColorStop(1, "#8dd003");
+        color.addColorStop(0, "#06f411");
+        color.addColorStop(1, "#fd2508");
         secContext.fillStyle = color;
 
         let width = secCanvas.width,
             height = secCanvas.height;
 
 
-        let centerX = data.viewWidth >> 1,
-            centerY = data.viewHeight >> 1,
-            offLeft = (data.viewWidth - width) >> 1,
-            offTop = (data.viewHeight - height) >> 1;
-
-
-        let self = this;
+        let offTop = (data.viewHeight - height) >> 1;
 
         let stage = new createjs.Stage(c);
-        let colorArr = ["#f28613","#a3590a","#774c1e","#d2a419","#d5ba67","#f0b708","#fefba1","#aea801"];
+
         class Ball {
             constructor(args) {
                 let {x,y,r,g,b,a,type} = args,
@@ -122,8 +116,8 @@ let util = {
                // context.fillStyle = 'rgba(' + dot.r + ',' + dot.g + ',' + dot.b + ',' + dot.a + ')';
 
                 let shape = new createjs.Shape();
-                let color=colorArr[utilMethods.r(0,colorArr.length,'floor')];
-                //color='rgba(' + dot.r + ',' + dot.g + ',' + dot.b + ',' + dot.a + ')'
+            //    let color=colorArr[utilMethods.r(0,colorArr.length,'floor')];
+               let color='rgba(' + dot.r + ',' + dot.g + ',' + dot.b + ',' + dot.a + ')'
                 shape.graphics.beginFill(color).drawCircle(0, 0, 4);
                 shape.x = dot.x;
                 shape.y = dot.y;
@@ -133,41 +127,38 @@ let util = {
         }
 
         this.Ball = Ball;
-
-
-        ///context.clearRect(0, 0, data.viewWidth, data.viewHeight);
         let marginLeft = 150,
             containerX = (data.viewWidth - 1200) / 2;
-
-
         this.render(secContext, width, height, containerX, offTop);
-
-
         setInterval(()=> {
             this.ballArr.forEach((b, i)=> {
-
-                if(!b.ripe &&  b.type === 'seconds'){
-                    //this.ballArr.splice(i, 1);
+                if(b.type === 'seconds'){
                     this.moveBallArr.push(b);
                 }
-
             });
 
 
-           let {seconds,mins} = this.renderSec('seconds', secContext, width, height, containerX, offTop);
+           let {seconds,mins,hours} = this.renderSec('seconds', secContext, width, height, containerX, offTop);
 
-/*            if(seconds === "00"){
+            if(seconds === "00"){
                 this.ballArr.forEach((b, i)=> {
                     if(b.type === 'mins'){
                         this.moveBallArr.push(b);
                     }
                 });
-                this.renderSec('mins', secContext, width, height, containerX, offTop)
-            }*/
+                this.update(mins, 'mins', secContext, width, height, containerX + marginLeft + width, offTop);//分
+            }
+
+            if(mins === '00' && seconds === "00"){
+                this.ballArr.forEach((b, i)=> {
+                    if(b.type === 'hours'){
+                        this.moveBallArr.push(b);
+                    }
+                });
+                this.update(hours, 'hours', secContext, width, height, containerX, offTop);//时
+            }
 
         }, 1000);
-
-
         createjs.Ticker.on('tick', ()=> {
 
             this.moveBallArr.forEach((ball, i)=> {
@@ -182,7 +173,6 @@ let util = {
 
                 if (Math.abs(ball.speedY) < 4 && T >= data.viewHeight - offTop) {
                     ball.speedY = 0;
-                   // T = data.viewHeight - 4 - offTop;
                 }
                 ball.shape.scaleX=2;
                 ball.shape.scaleY=2;
@@ -198,32 +188,15 @@ let util = {
                             this.ballArr.splice(j,1);
                         }
                     })
-
                 }
-
-                ///console.log(this.moveBallArr.length)
-
-
-                //console.log(T);
             });
-
-
             stage.update();
         });
-
-
-    },
-    startMove(stage){
-        let self = this;
-
-
     },
 
     fillZero(num){
-        return num < 10 ? "0" + num : num;
+        return num < 10 ? "0" + num : num+'';
     },
-
-
     render(secContext, width, height, containerX, offTop){
         let marginLeft = 150,
             date = new Date(),
@@ -233,7 +206,7 @@ let util = {
         hours = this.fillZero(hours);
         mins = this.fillZero(mins);
         seconds = this.fillZero(seconds);
-        this.update(hours, 'hour', secContext, width, height, containerX, offTop);//时
+        this.update(hours, 'hours', secContext, width, height, containerX, offTop);//时
         this.update(":", '0', secContext, width, height, containerX + width, offTop);//时
         this.update(mins, 'mins', secContext, width, height, containerX + marginLeft + width, offTop);//分
         this.update(":", '0', secContext, width, height, containerX + width * 2 + marginLeft, offTop);//时
@@ -262,7 +235,7 @@ let util = {
         }
         this.update(current, type, secContext, width, height, containerX + (marginLeft + width) * 2, offTop); //秒
 
-        return {seconds,mins}
+        return {seconds,mins,hours}
     },
 
 
